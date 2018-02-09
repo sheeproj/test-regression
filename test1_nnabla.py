@@ -22,7 +22,7 @@ nn.clear_parameters()
 batchsize = 100
 xdim = 2
 nlayers = [8,8]
-num_iter = 10000
+num_iter = 1000
 
 x = nn.Variable([batchsize, xdim], need_grad=True)
 label = nn.Variable([batchsize, 1], need_grad=True)
