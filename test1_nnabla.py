@@ -96,4 +96,7 @@ for i in range(len(tx)):
 ax.scatter(xs, ys, zs, color='green', marker='o', label='ground-truth')
 ax.scatter(xs, ys, results, color='red', marker='o', label='predicted')
 ax.legend()
+ax.set_xlabel('x0')
+ax.set_ylabel('x1')
+ax.set_zlabel('f(x0, x1)')
 plt.show()
