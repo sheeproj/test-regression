@@ -8,13 +8,19 @@ import nnabla.functions as F
 import nnabla.parametric_functions as PF
 from nnabla import solvers as S
 
+# data
+def random_data_provider(n):
+    x = np.random.uniform(-math.pi, math.pi, size=(n, 2))
+    y = np.array([math.sin(a[0]) + math.cos(a[1]) for a in x]).reshape(n,1)
+    #y = np.array([math.sin(a[0])*math.cos(a[1]) for a in x]).reshape(n,1)
+    return x, y
+
 # start NNabla
 nn.clear_parameters()
-batchsize = 10
+batchsize = 100
 xdim = 2
-nlayers = [16,16,16,16]
-num_iter = 20000
-
+nlayers = [8,8]
+num_iter = 10000
 
 x = nn.Variable([batchsize, xdim], need_grad=True)
 label = nn.Variable([batchsize, 1], need_grad=True)
@@ -25,8 +31,6 @@ for i, l in enumerate(nlayers):
     h = F.relu(PF.affine(h, l, name='fc{0}'.format(i)))
 y = PF.affine(h, 1, name='fc')
 
-print(nn.get_parameters())
-
 loss = F.reduce_mean(F.squared_error(y, label))
 
 solver = S.Adam(alpha=0.01)
@@ -34,12 +38,6 @@ solver.set_parameters(nn.get_parameters())
 
 for name, param in nn.get_parameters().items():
     print(name, param)
-
-def random_data_provider(n):
-    x = np.random.uniform(-math.pi, math.pi, size=(n, 2))
-    y = np.array([math.sin(a[0]) + math.cos(a[1]) for a in x]).reshape(n,1)
-    #y = np.array([math.sin(a[0])*math.cos(a[1]) for a in x]).reshape(n,1)
-    return x, y
 
 # training
 training_loss = []
@@ -75,7 +73,7 @@ plt.ylabel('loss')
 plt.show()
 
 # test
-tx, ty = random_data_provider(batchsize*100)
+tx, ty = random_data_provider(batchsize)
 results = []
 for i in range(0, tx.shape[0], batchsize):
     x.d = tx[i:i+batchsize]
