@@ -8,6 +8,8 @@ import nnabla.functions as F
 import nnabla.parametric_functions as PF
 from nnabla import solvers as S
 
+np.random.seed(1)
+
 # data
 def random_data_provider(n):
     x = np.random.uniform(-math.pi, math.pi, size=(n, 2))
