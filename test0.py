@@ -1,80 +1,98 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-a = 1.0
-b = 0.0
 lr = 0.0001 # learning rate
-loop = 100
+loop = 1000
 
-def activate(x):
-    return np.add(np.dot(a,x), b)
+def activate_ReLU(x, derivative=False): # ReLU
+    condlist = [x < 0, 0 <= x]
+    if derivative is False:
+        funclist = [lambda x:0, lambda x:x]
+    else:
+        funclist = [0, 1]
+    return np.piecewise(x, condlist, funclist)
 
-def dactivate():
-    return a
+def activate_ParametricReLU(x, derivative=False): # Leaky ReLU
+    a = 0.9
+    condlist = [x < 0, 0 <= x]
+    if derivative is False:
+        funclist = [lambda x:a*x, lambda x:x]
+    else:
+        funclist = [a, 1]
+    return np.piecewise(x, condlist, funclist)
 
-def loss(y, yl):
-    return (y - yl)*(y - yl)/2.0
+def loss(y, label, derivative=False):
+    if derivative is False:
+        return (y - label)*(y - label)/2.0
+    else:
+        return y - label
 
-def dloss(y, yl):
-    return y - yl
+if __name__ == "__main__":
 
-# training data sy = sx0 + sx1
-sx = np.array([[0,0],[1,2],[1,3],[2,1],[10,10]])
-sy = np.array([np.sum(x) for x in sx])
+    activate = activate_ParametricReLU
 
-np.random.seed(0)
+    # training data [sy = sx0 + sx1]
+    sx = np.array([[0,0],[1,2],[1,3],[2,1],[10,10]])
+    sy = np.array([np.sum(x) for x in sx])
+    print(sy)
 
-w0 = 2*np.random.random((2,2)) - 1
-w1 = 2*np.random.random((2,1)) - 1
+    # initialize weights
+    np.random.seed(0)
+    w0 = 2*np.random.random((2,2)) - 1
+    w1 = 2*np.random.random((2,2)) - 1
+    w2 = 2*np.random.random((2,1)) - 1
 
-error = np.zeros(loop)
-for epoch in range(loop):
+    error = np.zeros(loop)
+    for epoch in range(loop):
 
-    #print('=== epoch{0} ==='.format(epoch))
+        dw0 = np.zeros((2,2))
+        dw1 = np.zeros((2,2))
+        dw2 = np.zeros((2,1))
 
-    dw0 = np.zeros((2,2))
-    dw1 = np.zeros((2,1))
+        for i in range(len(sx)):
 
+            # forward-propagation
+            l1 = np.dot(w0,sx[i])
+            l2 = activate(l1)
+            l3 = np.dot(w1,l2)
+            l4 = activate(l3)
+            l5 = np.dot(w2.T,l4) # max
+
+            # calc error
+            error[epoch] += loss(l5, sy[i])
+
+            # back-propagation
+            delta_error = loss(l5, sy[i], True)
+
+            dw2 += lr*delta_error*l4.reshape((2,1))
+            dw1 += lr*delta_error*np.dot(w2.T, activate(l4, True))
+            dw0 += lr*delta_error*np.dot(w1, activate(l2, True))
+
+        # udpate weight
+        w0 = w0 - dw0
+        w1 = w1 - dw1
+        w2 = w2 - dw2
+        #print('w1', w1)
+        #print('w2', w2)
+
+    print('final loss : ', error[loop - 1])
+
+    training_result = []
     for i in range(len(sx)):
-
-        # forward propagation
-        l0 = sx[i]
-        l1 = np.dot(w0,l0)
+        l1 = np.dot(w0,sx[i])
         l2 = activate(l1)
-        l3 = np.dot(w1.T,l2) # max
+        l3 = np.dot(w1,l2)
+        l4 = activate(l3)
+        l5 = np.dot(w2.T,l4) # max
+        training_result.append(l5[0])
+    print('training result : ', training_result)
 
-        # error
-        error[epoch] += loss(l3, sy[i])
-        #print('sample{0} : act {1}, est {2}, error {3}'.format(i, sy[i], l3, error))
+    x = np.array([x for x in range(loop)])
+    y = np.array([y for y in error])
 
-        # back-propagation
-        delta_error = dloss(l3, sy[i])
-        d = delta_error*l2.reshape((2,1))
+    plt.subplot(111)
+    plt.plot(x, y)
+    plt.xlabel('epoch')
+    plt.ylabel('error')
+    plt.show()
 
-        dw1 += lr*d
-        dw0 += lr*d*(dactivate()*l1)
-
-    #print(dw0, dw1)
-    # udpate weight
-    w0 = w0 - dw0
-    w1 = w1 - dw1
-
-x = np.array([x for x in range(loop)])
-y = np.array([y for y in error])
-
-plt.subplot(111)
-plt.plot(x, y)
-plt.xlabel('epoch')
-plt.ylabel('error')
-plt.show()
-
-'''
-print('test')
-print('w0', w0)
-print('w1', w1)
-l0 = np.array([2,2])
-l1 = np.dot(w0,l0)
-l2 = activate(l1)
-l3 = np.dot(w1.T,l2) # max
-print(l3)
-'''
