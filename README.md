@@ -1,6 +1,6 @@
 # test0_nnabla.py
 
-This script predicts values of simple linear function using the NNabla solver.
+This script predicts an output value of simple linear function using the NNabla solver.
 The objective function is
 
 ```math
@@ -11,15 +11,15 @@ This is just a test-code for myself.
 
 # test1_nnabla.py
 
-This script predicts values of simple linear function using the NNabla solver.
+This script predicts an output value of simple linear function using the NNabla solver.
 The objective function is
 
 ```math
 y = f(x0, x1) = sin(x0) + cos(x1)
 ```
 
-The network layer size is defined as [8 -> 8] and batch_size is 100.
-It can show how network layer and batch_size affect prediction accuracy.
+With a default configuration, The network layer size is defined as [8 -> 8] and batch_size is 100.
+It can show how network layer size and batch_size affect prediction accuracy.
 Here are some results.
 
 ### network layer = [2 -> 2], batch_size = 100

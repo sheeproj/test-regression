@@ -8,21 +8,22 @@ import nnabla.functions as F
 import nnabla.parametric_functions as PF
 from nnabla import solvers as S
 
+xdim = 2
+num_iter = 1000
 np.random.seed(1)
 
-# data
+# data provider
 def random_data_provider(n):
-    x = np.random.uniform(-math.pi, math.pi, size=(n, 2))
+    x = np.random.uniform(-math.pi, math.pi, size=(n, xdim))
     y = np.array([math.sin(a[0]) + math.cos(a[1]) for a in x]).reshape(n,1)
     #y = np.array([math.sin(a[0])*math.cos(a[1]) for a in x]).reshape(n,1)
     return x, y
 
 # start NNabla
 nn.clear_parameters()
-batchsize = 100
-xdim = 2
-nlayers = [8,8]
-num_iter = 1000
+batchsize = 100 # 1. change this parameter
+nlayers = [8,8] # 2. change this parameter
+
 
 x = nn.Variable([batchsize, xdim], need_grad=True)
 label = nn.Variable([batchsize, 1], need_grad=True)
