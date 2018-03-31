@@ -7,7 +7,7 @@ The objective function is
 y = f(x0, x1) = x0 + x1
 ```
 
-This is just a test-code for myself.
+This is just a test-code for my practice.
 
 # test1_nnabla.py
 
